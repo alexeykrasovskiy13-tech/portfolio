@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Alexei — сайты, боты, инфографика</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #000;
+    --surface: #0e0e10;
+    --surface-2: #1a1a1d;
+    --text: #f5f5f6;
+    --muted: #a0a0a8;
+    --border: rgba(255, 255, 255, .1);
+    --glow: rgba(232, 147, 74, .55);
+    --radius: 14px;
+    --nav-h: 64px;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  img { display: block; max-width: 100%; }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; }
+  :focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+  [id] { scroll-margin-top: var(--nav-h); }
+
+  /* Кнопки */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+    padding: .7rem 1.25rem;
+    border: 0; border-radius: 10px;
+    font-weight: 600; font-size: .95rem;
+    cursor: pointer;
+    transition: transform .2s ease, border-color .2s;
+  }
+  .btn:active { transform: scale(.97); }
+  .btn--light { background: linear-gradient(#fff, #d9d9dc); color: #000; }
+  .btn--sm { padding: .5rem 1rem; font-size: .85rem; border-radius: 8px; }
+  .btn--lg { padding: .95rem 1.6rem; font-size: 1rem; border-radius: 12px; }
+
+  /* Навигация */
+  .nav {
+    position: fixed; inset: 0 0 auto 0; z-index: 50;
+    height: var(--nav-h);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px;
+    background: rgba(0, 0, 0, .7);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .logo { display: flex; align-items: center; gap: .65rem; font-weight: 700; letter-spacing: -.01em; }
+  .logo__mark {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: grid; place-items: center;
+    background: linear-gradient(145deg, #2a2a2e, #0e0e10);
+    border: 1px solid var(--border);
+    font-weight: 800; font-size: 1rem;
+  }
+
+  /* 1. Первый экран: три направления */
+  .hero { position: relative; padding: calc(var(--nav-h) + 2rem) 16px 3.5rem; overflow: hidden; text-align: center; }
+  .hero::after {
+    content: ""; position: absolute; left: 50%; bottom: 0;
+    width: 140vw; max-width: 1100px; height: 320px;
+    transform: translateX(-50%);
+    background: radial-gradient(ellipse at 50% 100%, var(--glow), transparent 65%);
+    pointer-events: none; z-index: 0;
+  }
+  .hero > * { position: relative; z-index: 1; }
+  .badge {
+    display: inline-flex; align-items: center; gap: .5rem;
+    padding: .4rem 1rem;
+    border: 1px solid var(--border); border-radius: 999px;
+    background: rgba(20, 24, 34, .7);
+    color: #cfd3dc; font-size: .82rem;
+  }
+  .badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #3fb950; box-shadow: 0 0 10px #3fb950; }
+  .hero__title {
+    margin: 1.2rem 0 0;
+    font-size: clamp(2rem, 8.6vw, 4.2rem);
+    line-height: 1.06; letter-spacing: -.04em; font-weight: 700;
+  }
+  .hero__title span { display: block; white-space: nowrap; }
+  .fade {
+    background: linear-gradient(180deg, #fff 0%, #7d7d85 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .hero__sub { margin: 1rem auto 0; max-width: 26rem; color: var(--muted); font-size: 1rem; }
+
+  .dirs { display: grid; gap: 10px; max-width: 520px; margin: 1.6rem auto 0; text-align: left; }
+  .dir {
+    display: grid; grid-template-columns: 64px 1fr auto; align-items: center; gap: 14px;
+    padding: 10px 16px 10px 10px;
+    border: 1px solid var(--border); border-radius: 16px;
+    background: rgba(14, 14, 16, .85);
+    transition: transform .2s ease, border-color .2s;
+  }
+  .dir:active { transform: scale(.98); }
+  @media (hover: hover) { .dir:hover { border-color: rgba(255, 255, 255, .24); } }
+  .dir img { width: 64px; height: 64px; border-radius: 12px; }
+  .dir b { display: block; font-size: 1rem; letter-spacing: -.01em; }
+  .dir span { display: block; color: var(--muted); font-size: .84rem; line-height: 1.35; margin-top: .1rem; }
+  .dir i { font-style: normal; color: var(--muted); }
+  .hero__cta { margin-top: 1.4rem; }
+
+  /* Секции */
+  .section { padding: 3.5rem 16px; }
+  .section > * { max-width: 1100px; margin-left: auto; margin-right: auto; }
+  .head { text-align: center; max-width: 36rem; margin: 0 auto 2rem; }
+  .head h2 { margin: 0; font-size: clamp(1.75rem, 7vw, 3rem); line-height: 1.1; letter-spacing: -.035em; }
+  .head p { margin: .75rem 0 0; color: var(--muted); }
+
+  /* 2. Сайты: сетка 2×2 */
+  .stack { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; max-width: 720px; margin: 0 auto; }
+  .proj { position: relative; }
+  .card {
+    position: relative;
+    border: 1px solid var(--border); border-radius: 18px;
+    padding: .55rem;
+    background: var(--surface);
+    box-shadow: 0 9px 20px #0000004a, 0 37px 37px #00000042, 0 84px 50px #00000026;
+  }
+  .card__screen {
+    display: block; width: 100%; padding: 0; border: 0;
+    aspect-ratio: 3 / 4; overflow: hidden; border-radius: 10px;
+    background: var(--surface-2); cursor: zoom-in;
+  }
+  .card__screen img { width: 100%; height: 100%; object-fit: cover; object-position: top; transition: transform .6s ease; }
+  .card__screen:active img { transform: scale(1.03); }
+  .proj__open {
+    position: absolute; top: .9rem; right: .9rem;
+    width: 30px; height: 30px; display: grid; place-items: center;
+    border-radius: 50%; border: 1px solid rgba(255, 255, 255, .25);
+    background: rgba(0, 0, 0, .55); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    color: #fff; font-size: .8rem; pointer-events: none;
+  }
+  .proj__meta { padding: .7rem .3rem .25rem; }
+  .proj__num { color: var(--muted); font-size: .7rem; font-variant-numeric: tabular-nums; letter-spacing: .08em; }
+  .proj__title { display: block; font-weight: 700; font-size: 1rem; letter-spacing: -.02em; margin-top: .1rem; }
+  .proj__kind { display: block; color: var(--muted); font-size: .76rem; line-height: 1.35; margin-top: .15rem; }
+
+  /* 3. Telegram-боты */
+  .bot {
+    display: grid; max-width: 820px;
+    border: 1px solid var(--border); border-radius: 20px;
+    background: var(--surface); overflow: hidden;
+  }
+  .bot__chat { position: relative; aspect-ratio: 16 / 11; }
+  .chat {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; justify-content: center; gap: .45rem;
+    padding: 1rem 1.1rem;
+    background: radial-gradient(circle at 80% 0%, rgba(84, 169, 235, .22), transparent 60%), #0f1419;
+    font-size: .82rem;
+  }
+  .msg { max-width: 78%; padding: .5rem .75rem; border-radius: 14px; line-height: 1.35; }
+  .msg--in { background: #1e2a36; border-bottom-left-radius: 4px; }
+  .msg--out { align-self: flex-end; background: #2b5278; border-bottom-right-radius: 4px; }
+  .chips { display: flex; gap: .35rem; flex-wrap: wrap; }
+  .chips span { padding: .35rem .7rem; border-radius: 8px; background: rgba(84, 169, 235, .16); color: #8cc8f5; font-weight: 600; }
+  .feats { list-style: none; margin: 0; padding: .4rem 1.4rem; }
+  .feats li { padding: .95rem 0; border-top: 1px solid var(--border); }
+  .feats li:first-child { border-top: 0; }
+  .feats b { display: block; font-size: 1rem; letter-spacing: -.01em; }
+  .feats span { display: block; color: var(--muted); font-size: .9rem; margin-top: .15rem; }
+
+  /* 4. Инфографика: горизонтальная лента */
+  .section--flush { padding-left: 0; padding-right: 0; }
+  .section--flush .head { padding: 0 16px; }
+  .gallery {
+    display: flex; gap: 12px;
+    overflow-x: auto; scroll-snap-type: x mandatory;
+    padding: 0 16px 6px; scroll-padding: 0 16px;
+    -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+  .gallery::-webkit-scrollbar { display: none; }
+  .gitem { flex: 0 0 72%; max-width: 300px; scroll-snap-align: start; }
+  .gitem__img {
+    display: block; width: 100%; padding: 0;
+    aspect-ratio: 3 / 4; overflow: hidden;
+    border: 1px solid var(--border); border-radius: 16px;
+    background: var(--surface-2); cursor: zoom-in;
+  }
+  .gitem__img img { width: 100%; height: 100%; object-fit: cover; }
+  .gitem .proj__meta { padding-left: .2rem; }
+
+  /* Полноэкранный просмотр */
+  .viewer {
+    position: fixed; inset: 0;
+    width: 100%; max-width: none; height: 100%; max-height: none;
+    margin: 0; padding: 0; border: 0;
+    background: #000; color: var(--text);
+  }
+  .viewer[open] { display: flex; flex-direction: column; animation: viewer-in .4s cubic-bezier(.2, .7, .2, 1); }
+  .viewer::backdrop { background: #000; }
+  @keyframes viewer-in { from { opacity: 0; transform: translateY(24px); } }
+  .viewer__bar {
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .viewer__bar b { display: block; font-size: 1rem; letter-spacing: -.02em; }
+  .viewer__bar span { display: block; color: var(--muted); font-size: .8rem; }
+  .viewer__close {
+    width: 40px; height: 40px; flex: 0 0 auto;
+    border: 1px solid var(--border); border-radius: 50%;
+    background: rgba(255, 255, 255, .06); color: #fff;
+    font-size: 1.4rem; line-height: 1; cursor: pointer;
+  }
+  .viewer__scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+  .viewer__inner { max-width: 720px; margin: 0 auto; padding: 16px 16px calc(24px + env(safe-area-inset-bottom)); }
+  .viewer__inner img { width: 100%; height: auto; border-radius: 12px; }
+  .viewer__cta { display: flex; margin-top: 16px; width: 100%; padding: 1rem; border-radius: 12px; font-size: 1rem; }
+  .proj__live {
+    position: absolute; top: .9rem; left: .9rem;
+    display: inline-flex; align-items: center; gap: .4rem;
+    padding: .25rem .6rem; border-radius: 999px;
+    background: rgba(0, 0, 0, .7); color: #fff; font-size: .7rem; font-weight: 600;
+    pointer-events: none;
+  }
+  .proj__live::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #3fb950; box-shadow: 0 0 8px #3fb950; }
+  .vctl { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+  .seg { display: inline-flex; padding: 3px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+  .seg button { border: 0; background: none; color: var(--muted); padding: .45rem .8rem; border-radius: 7px; font-size: .85rem; cursor: pointer; }
+  .seg button.on { background: #fff; color: #000; font-weight: 600; }
+  .shot--phone img { max-width: 390px; margin: 0 auto; border-radius: 22px; border: 1px solid var(--border); }
+  .live__hint { margin: 0 0 10px; color: var(--muted); font-size: .88rem; }
+  .live iframe { display: block; width: 100%; height: min(78vh, 860px); border: 0; border-radius: 12px; background: #f5f2ec; }
+  .brief { display: grid; gap: 10px; margin-bottom: 16px; }
+  .brief > div { padding: 14px 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+  .brief small { display: block; color: var(--muted); font-size: .72rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+  .brief p { margin: .3rem 0 0; font-size: .95rem; }
+
+  /* 5. Обо мне */
+  .about {
+    max-width: 640px;
+    padding: 1.4rem;
+    border: 1px solid var(--border); border-radius: 22px;
+    background: var(--surface);
+  }
+  .about__top { display: flex; align-items: center; gap: 1rem; }
+  .avatar {
+    width: 56px; height: 56px; flex: 0 0 auto; border-radius: 50%;
+    display: grid; place-items: center;
+    background: radial-gradient(circle at 50% 70%, rgba(232, 147, 74, .35), transparent 70%), #050505;
+    border: 1px solid var(--border);
+    font-weight: 800; font-size: 1.5rem; letter-spacing: -.04em;
+  }
+  .about__top h3 { margin: 0; font-size: 1.35rem; letter-spacing: -.02em; line-height: 1.2; }
+  .about__role { margin: .15rem 0 0; color: var(--muted); font-size: .88rem; }
+  .about .text { color: var(--muted); margin: 1rem 0 0; }
+  .about .btn { margin-top: 1.3rem; }
+
+  /* 6. Контакт */
+  .contact { text-align: center; padding: 3rem 16px calc(4.5rem + env(safe-area-inset-bottom)); }
+  .contact h2 { margin: 0; font-size: clamp(1.7rem, 7vw, 2.6rem); letter-spacing: -.035em; }
+  .contact p { color: var(--muted); margin: .75rem 0 1.6rem; }
+  .contact__links { display: flex; flex-direction: column; align-items: center; gap: .5rem; max-width: 360px; margin: 0 auto; }
+  .contact__links .btn--light { width: 100%; padding: 1rem; border-radius: 12px; font-size: 1rem; }
+  .contact__handle { padding: .4rem .8rem; border: 0; background: none; color: var(--muted); font-size: .9rem; cursor: pointer; }
+
+  /* Появление блоков */
+  .reveal { opacity: 0; transform: translate3d(0, 40px, 0) rotateX(12deg); transition: opacity .7s ease, transform .7s cubic-bezier(.2, .7, .2, 1); }
+  .reveal.is-in { opacity: 1; transform: none; }
+
+  @media (min-width: 769px) {
+    .nav { padding: 0 clamp(1rem, 4vw, 4.5rem); }
+    .dirs { grid-template-columns: repeat(3, 1fr); max-width: 1000px; }
+    .stack { gap: 20px; }
+    .bot { grid-template-columns: 1fr 1fr; }
+    .bot__chat { aspect-ratio: auto; min-height: 320px; }
+    .feats { padding: 1rem 1.8rem; align-self: center; }
+    .gallery { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; max-width: 1100px; margin: 0 auto; overflow: visible; }
+    .gitem { max-width: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .reveal { opacity: 1; transform: none; transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <a class="logo" href="#top"><span class="logo__mark">A</span>Alexei</a>
+  <button class="btn btn--light btn--sm" type="button" data-contact>Написать</button>
+</header>
+
+<main id="top">
+
+  <section class="hero">
+    <a class="badge" href="#contact">Принимаю заказы</a>
+    <h1 class="hero__title">
+      <span>Сайты,</span>
+      <span>Telegram-боты</span>
+      <span class="fade">и инфографика</span>
+    </h1>
+    <p class="hero__sub">Для бизнеса и личных проектов — от идеи до запуска.</p>
+    <nav class="dirs" aria-label="Направления">
+      <a class="dir" href="#sites"><img data-thumb="site" alt=""><div><b>Сайты и лендинги</b><span>Понятная структура и удобная заявка</span></div><i aria-hidden="true">↓</i></a>
+      <a class="dir" href="#bots"><img data-thumb="bot" alt=""><div><b>Telegram-боты</b><span>Заявки, запись, рассылки, автоответы</span></div><i aria-hidden="true">↓</i></a>
+      <a class="dir" href="#infographics"><img data-thumb="info" alt=""><div><b>Инфографика</b><span>Карточки товаров, схемы, отчёты</span></div><i aria-hidden="true">↓</i></a>
+    </nav>
+    <button class="btn btn--light btn--lg hero__cta" type="button" data-contact>Обсудить проект</button>
+  </section>
+
+  <section class="section" id="sites">
+    <div class="head">
+      <h2>Сайты</h2>
+      <p>Демонстрационные концепты: показывают, как я подхожу к разным задачам. LUNA — работающий магазин, остальные можно посмотреть по страницам и в версии для телефона.</p>
+    </div>
+    <div class="stack" data-stack></div>
+  </section>
+
+  <section class="section" id="bots">
+    <div class="head">
+      <h2>Telegram-боты</h2>
+      <p>Бот работает круглосуточно: принимает заявки, отвечает клиентам и снимает с вас рутину.</p>
+    </div>
+    <div class="bot reveal">
+      <div class="bot__chat" aria-hidden="true">
+        <div class="chat">
+          <div class="msg msg--in">Здравствуйте! На какую услугу вас записать?</div>
+          <div class="chips"><span>Стрижка</span><span>Маникюр</span><span>Уход</span></div>
+          <div class="msg msg--out">Маникюр</div>
+          <div class="msg msg--in">Есть окно сегодня в 18:00. Подтвердить запись?</div>
+        </div>
+      </div>
+      <ul class="feats">
+        <li><b>Запись и заявки</b><span>Клиент выбирает услугу и удобное время прямо в чате.</span></li>
+        <li><b>Каталог и оплата</b><span>Товары с ценами и оплата без перехода на сайт.</span></li>
+        <li><b>Рассылки</b><span>Новости и напоминания вашим клиентам.</span></li>
+        <li><b>Автоответы</b><span>Ответы на частые вопросы — сразу, без вашего участия.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--flush" id="infographics">
+    <div class="head">
+      <h2>Инфографика</h2>
+      <p>Демонстрационные примеры: карточка товара, маршрут путешествия, отчёт и пост для соцсетей. Нажмите, чтобы увеличить.</p>
+    </div>
+    <div class="gallery reveal" data-gallery></div>
+  </section>
+
+  <section class="section" id="about">
+    <div class="head"><h2>Обо мне</h2></div>
+    <div class="about reveal">
+      <div class="about__top">
+        <span class="avatar" aria-hidden="true">A</span>
+        <div>
+          <h3>Alexei</h3>
+          <p class="about__role">Сайты · Telegram-боты · Инфографика</p>
+        </div>
+      </div>
+      <p class="text">Делаю сайты, Telegram-ботов и инфографику для бизнеса и частных проектов.</p>
+      <p class="text">Начинаю с задачи: для кого проект и какой результат он должен дать. Потом — дизайн, разработка и запуск.</p>
+      <p class="text">Всё время на связи: показываю промежуточные результаты, отвечаю на вопросы и довожу проект до запуска.</p>
+      <button class="btn btn--light" type="button" data-contact>Обсудить проект</button>
+    </div>
+  </section>
+
+  <section class="contact" id="contact">
+    <h2>Обсудим ваш проект?</h2>
+    <p>Напишите мне в Telegram — отвечу в ближайшее время.</p>
+    <div class="contact__links">
+      <button class="btn btn--light" type="button" data-contact>Обсудить проект</button>
+      <button class="contact__handle" type="button" data-contact>@IKarmaaa</button>
+    </div>
+  </section>
+
+</main>
+
+<dialog class="viewer" data-viewer aria-label="Просмотр работы">
+  <div class="viewer__bar">
+    <div><b data-viewer-title></b><span data-viewer-kind></span></div>
+    <button class="viewer__close" type="button" data-viewer-close aria-label="Закрыть">×</button>
+  </div>
+  <div class="viewer__scroll" data-viewer-scroll>
+    <div class="viewer__inner">
+      <div class="brief" data-brief hidden>
+        <div><small>Задача</small><p data-brief-task></p></div>
+        <div><small>Решение</small><p data-brief-solution></p></div>
+      </div>
+      <div class="vctl" data-vctl hidden>
+        <div class="seg" data-tabs></div>
+        <div class="seg" data-devs><button type="button" data-dev="desktop">Компьютер</button><button type="button" data-dev="phone">Телефон</button></div>
+      </div>
+      <div class="live" data-live hidden>
+        <p class="live__hint">Это работающий сайт: можно листать каталог, выбрать размер и добавить товар в корзину.</p>
+      </div>
+      <div class="shot" data-shot><img data-viewer-img alt=""></div>
+      <button class="btn btn--light viewer__cta" type="button" data-contact data-viewer-cta>Хочу такой сайт</button>
+    </div>
+  </div>
+</dialog>
+
+<script src="photos.js"></script>
+<script src="concepts.js"></script>
+<script>
+(function () {
+  var TG_LINK = "https://t.me/IKarmaaa";
+  var tg = window.Telegram && window.Telegram.WebApp;
+  var inTelegram = !!(tg && tg.initData);
+
+  if (inTelegram) {
+    tg.ready();
+    tg.expand();
+    try { tg.setHeaderColor("#000000"); tg.setBackgroundColor("#000000"); } catch (e) {}
+    try { if (tg.disableVerticalSwipes) tg.disableVerticalSwipes(); } catch (e) {}
+  }
+
+  document.querySelectorAll("[data-contact]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      if (inTelegram) tg.openTelegramLink(TG_LINK);
+      else window.open(TG_LINK, "_blank");
+    });
+  });
+
+  var C = window.CONCEPTS;
+
+  /* Миниатюры в карточках первого экрана */
+  document.querySelectorAll("[data-thumb]").forEach(function (img) { img.src = C.thumbs[img.getAttribute("data-thumb")]; });
+
+  /* ---------- Сайты: сетка 2×2 ---------- */
+  var stackEl = document.querySelector("[data-stack]");
+  C.works.forEach(function (w, i) {
+    var el = document.createElement("article");
+    el.className = "proj reveal";
+    el.innerHTML =
+      '<div class="card">' +
+        '<button class="card__screen" type="button"><img alt="" draggable="false"></button>' +
+        '<span class="proj__open" aria-hidden="true">↗</span>' +
+        (w.live ? '<span class="proj__live">Живой сайт</span>' : '') +
+        '<div class="proj__meta"><span class="proj__num">0' + (i + 1) + ' / 0' + C.works.length + '</span>' +
+        '<b class="proj__title"></b><span class="proj__kind"></span></div>' +
+      '</div>';
+    el.querySelector(".proj__title").textContent = w.title;
+    el.querySelector(".proj__kind").textContent = w.kind;
+    var img = el.querySelector("img");
+    img.src = w.src; img.alt = w.title + " — " + w.kind;
+    var btn = el.querySelector(".card__screen");
+    btn.setAttribute("aria-label", "Открыть сайт " + w.title);
+    btn.addEventListener("click", function () { openViewer(w, "Хочу такой сайт"); });
+    stackEl.appendChild(el);
+  });
+
+  /* ---------- Инфографика: лента ---------- */
+  var galEl = document.querySelector("[data-gallery]");
+  C.infographics.forEach(function (g) {
+    var el = document.createElement("article");
+    el.className = "gitem";
+    el.innerHTML =
+      '<button class="gitem__img" type="button"><img alt="" draggable="false"></button>' +
+      '<div class="proj__meta"><b class="proj__title"></b><span class="proj__kind"></span></div>';
+    el.querySelector(".proj__title").textContent = g.title;
+    el.querySelector(".proj__kind").textContent = g.kind;
+    var img = el.querySelector("img");
+    img.src = g.src; img.alt = g.title + " — " + g.kind;
+    var btn = el.querySelector(".gitem__img");
+    btn.setAttribute("aria-label", "Увеличить: " + g.title + ", " + g.kind);
+    btn.addEventListener("click", function () { openViewer(g, "Хочу такую инфографику"); });
+    galEl.appendChild(el);
+  });
+
+  /* ---------- Полноэкранный просмотр ---------- */
+  var viewer = document.querySelector("[data-viewer]");
+  var vImg = document.querySelector("[data-viewer-img]");
+  var vScroll = document.querySelector("[data-viewer-scroll]");
+  var vBrief = document.querySelector("[data-brief]");
+  var vCta = document.querySelector("[data-viewer-cta]");
+  var vCtl = document.querySelector("[data-vctl]");
+  var vTabs = document.querySelector("[data-tabs]");
+  var vLive = document.querySelector("[data-live]");
+  var vShot = document.querySelector("[data-shot]");
+  var backBtn = inTelegram && tg.BackButton;
+  // На телефоне по умолчанию показываем мобильную версию — её текст читается без зума
+  var device = window.innerWidth < 769 ? "phone" : "desktop";
+  var cur = null, pageIdx = 0;
+
+  function showPage() {
+    var p = cur.pages[pageIdx];
+    vImg.src = p[device];
+    vImg.alt = cur.title + " — " + p.name + (device === "phone" ? ", телефон" : ", компьютер");
+    vShot.classList.toggle("shot--phone", device === "phone");
+    vTabs.querySelectorAll("button").forEach(function (b, i) { b.classList.toggle("on", i === pageIdx); });
+    document.querySelectorAll("[data-dev]").forEach(function (b) { b.classList.toggle("on", b.getAttribute("data-dev") === device); });
+  }
+  vTabs.addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    pageIdx = +b.getAttribute("data-page"); showPage(); vScroll.scrollTop = 0;
+  });
+  document.querySelector("[data-devs]").addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    device = b.getAttribute("data-dev"); showPage();
+  });
+
+  function openViewer(item, cta) {
+    cur = item; pageIdx = 0;
+    document.querySelector("[data-viewer-title]").textContent = item.title;
+    document.querySelector("[data-viewer-kind]").textContent = item.kind;
+    if (item.task) {
+      document.querySelector("[data-brief-task]").textContent = item.task;
+      document.querySelector("[data-brief-solution]").textContent = item.solution;
+      vBrief.hidden = false;
+    } else vBrief.hidden = true;
+    vCta.textContent = cta;
+
+    vCtl.hidden = !item.pages;
+    vLive.hidden = !item.live;
+    vShot.hidden = !!item.live;
+    if (item.live) {
+      var fr = document.createElement("iframe");
+      fr.src = item.live; fr.title = item.title + " — работающий сайт";
+      vLive.appendChild(fr);
+    } else if (item.pages) {
+      vTabs.innerHTML = item.pages.map(function (p, i) { return '<button type="button" data-page="' + i + '">' + p.name + '</button>'; }).join("");
+      showPage();
+    } else {
+      vShot.classList.remove("shot--phone");
+      vImg.src = item.src; vImg.alt = item.title + " — " + item.kind;
+    }
+    vScroll.scrollTop = 0;
+    if (!viewer.open) viewer.showModal();
+    document.documentElement.style.overflow = "hidden";
+    if (backBtn) { backBtn.onClick(closeViewer); backBtn.show(); }
+  }
+  function closeViewer() { if (viewer.open) viewer.close(); }
+  viewer.addEventListener("close", function () {
+    document.documentElement.style.overflow = "";
+    var fr = vLive.querySelector("iframe"); if (fr) fr.remove();
+    if (backBtn) { backBtn.offClick(closeViewer); backBtn.hide(); }
+  });
+  document.querySelector("[data-viewer-close]").addEventListener("click", closeViewer);
+
+  /* ---------- Появление блоков ---------- */
+  var reveals = document.querySelectorAll(".reveal");
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduceMotion || !("IntersectionObserver" in window)) {
+    reveals.forEach(function (el) { el.classList.add("is-in"); });
+  } else {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add("is-in"); io.unobserve(e.target); }
+      });
+    }, { rootMargin: "0px 0px -8% 0px", threshold: .12 });
+    reveals.forEach(function (el, i) { el.style.transitionDelay = (i % 3) * 90 + "ms"; io.observe(el); });
+  }
+})();
+</script>
+</body>
+</html>
